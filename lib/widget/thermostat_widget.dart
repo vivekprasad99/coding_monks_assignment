@@ -13,9 +13,7 @@ class ThermoStatWidget extends StatefulWidget {
   State<ThermoStatWidget> createState() => _ThermoStatWidgetState();
 }
 
-class _ThermoStatWidgetState extends State<ThermoStatWidget>{
-
-
+class _ThermoStatWidgetState extends State<ThermoStatWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,22 +71,28 @@ class _ThermoStatWidgetState extends State<ThermoStatWidget>{
                         height: 50,
                       ),
                       buildTemperatureText(),
-                       AnimatedContainer(
+                      AnimatedContainer(
                         height: value.containerHeightValue,
-                         duration: const Duration(seconds: 1),
-                         curve: Curves.easeInOut,
+                        duration: const Duration(seconds: 1),
+                        curve: Curves.easeInOut,
                       ),
-                      SwitchWidget(() {
-                        context.read<ThermostatProvider>().isButttonClicked();
-                        context.read<ThermostatProvider>().updateContainerHeight(30);
-                      },value.isButttonClickedValue,(double value){
-                        context.read<ThermostatProvider>().updateVolumeChanged(value);
-                      },value.volumeValue),
+                      SwitchWidget(
+                          () {
+                            onButtonClick(value);
+                          },
+                          value.isButttonClickedValue,
+                          (double value) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) =>
+                                context
+                                    .read<ThermostatProvider>()
+                                    .updateVolumeChanged(value));
+                          },
+                          value.volumeValue),
                       buildTemperatureWidget(value.isButttonClickedValue),
                       const SizedBox(
                         height: 36,
                       ),
-                       ModeWidget(value.isButttonClickedValue),
+                      ModeWidget(value.isButttonClickedValue),
                     ],
                   ),
                 )),
@@ -180,5 +184,13 @@ class _ThermoStatWidgetState extends State<ThermoStatWidget>{
         ),
       ],
     );
+  }
+
+  void onButtonClick(ThermostatProvider value) {
+    WidgetsBinding.instance.addPostFrameCallback(
+        (_) => context.read<ThermostatProvider>().isButttonClicked());
+    WidgetsBinding.instance.addPostFrameCallback((_) => context
+        .read<ThermostatProvider>()
+        .updateContainerHeight(value.isButttonClickedValue ? 30 : 50));
   }
 }
